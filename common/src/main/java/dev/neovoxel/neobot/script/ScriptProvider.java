@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
+import org.graalvm.polyglot.Value;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -23,6 +24,8 @@ public class ScriptProvider {
     private boolean scriptSystemLoaded = false;
 
     private List<Script> scripts = new ArrayList<>();
+
+    private List<Value> placeholderParsers = new ArrayList<>();
 
     private final NeoBot plugin;
 
@@ -53,7 +56,7 @@ public class ScriptProvider {
                 .logHandler(stream)
                 .build();
         context = Context.newBuilder("js")
-                .allowAllAccess(true)
+                .allowIO(true)
                 .engine(engine)
                 .build();
         context.getBindings("js").putMember("qq", plugin.getBotProvider().getBotListener());
@@ -61,6 +64,7 @@ public class ScriptProvider {
         context.getBindings("js").putMember("gameEvent", plugin.getGameEventListener());
         context.getBindings("js").putMember("gameCommand", plugin.getCommandProvider());
         context.getBindings("js").putMember("messageConfig", plugin.getMessageConfig());
+        context.getBindings("js").putMember("generalConfig", plugin.getGeneralConfig());
         File scriptPath = new File(plugin.getDataFolder(), "scripts");
         if (!scriptPath.exists()) {
             scriptPath.mkdirs();
@@ -110,9 +114,24 @@ public class ScriptProvider {
     public void unloadScript() {
         context.close();
         context = null;
+        scripts.clear();
+        placeholderParsers.clear();
     }
 
     public void downloadDefault() {
 
+    }
+
+    public void loadParser(Value value) {
+        if (value.canExecute()) {
+            placeholderParsers.add(value);
+        }
+    }
+
+    public String parse(String content) {
+        for (Value value : placeholderParsers) {
+            content = value.execute(content).asString();
+        }
+        return content;
     }
 }

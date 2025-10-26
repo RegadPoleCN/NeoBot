@@ -1,9 +1,8 @@
 package dev.neovoxel.neobot.game;
 
-import dev.neovoxel.nbapi.event.NEvent;
 import dev.neovoxel.neobot.NeoBot;
 import dev.neovoxel.neobot.game.event.ChatEvent;
-import dev.neovoxel.neobot.game.event.JoinEvent;
+import dev.neovoxel.neobot.game.event.LoginEvent;
 import dev.neovoxel.neobot.util.Player;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
@@ -21,6 +20,10 @@ public class GameEventListener {
         this.plugin = plugin;
     }
 
+    public void reset() {
+        map.clear();
+    }
+
     @HostAccess.Export
     public void register(String eventName, Value method) {
         if (method.canExecute()) map.put(method, eventName);
@@ -34,9 +37,14 @@ public class GameEventListener {
         }
     }
 
-    public void onJoin(JoinEvent event) {
-        fireEvent("JoinEvent", event);
+    public void onLogin(LoginEvent event) {
+        fireEvent("LoginEvent", event);
     }
+
+    public void onJoin(Player player) {
+        fireEvent("JoinEvent", player);
+    }
+
 
     public void onQuit(Player player) {
         fireEvent("QuitEvent", player);

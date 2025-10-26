@@ -8,6 +8,7 @@ declare interface GroupMessageEvent extends QQEvent {
     getMessageId(): number
     getSenderId(): number
     getRawMessage(): string
+    getJsonMessage(): string
 }
 
 declare interface GroupMessageEvent extends QQEvent {
@@ -125,13 +126,16 @@ declare interface Config {
     getInt(node: string): number
     getBoolean(node: string): boolean
     has(node: string): boolean
-    put(node: string, value: any): void
+    put(node: string, value: any): void // 该方法并不将 put 的对象持久化
     getObject(node: string): Config
     getArray(node: string): Config[]
     getStringArray(node: string): string[]
+    getNumberArray(node: string): number[]
 }
 
-declare interface MessageConfig {
+declare const generalConfig: Config
+
+declare interface MessageConfig extends Config {
     getMessage(node: string): string
     addOption(node: string, defaultValue: any): void
 }
@@ -225,6 +229,8 @@ declare interface NeoBot {
     getOnlinePlayers(): Player[]
     getOnlinePlayer(name: string): Player
     parsePlaceholder(message: string, player: Player): string
+    addInternalParser(parser: (arg: string) => string): void
+    internalParse(content: string): string
 }
 
 declare const plugin: NeoBot

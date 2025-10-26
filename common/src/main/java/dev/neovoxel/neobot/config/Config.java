@@ -100,6 +100,21 @@ public class Config {
     }
 
     @HostAccess.Export
+    public long[] getNumberArray(String node) {
+        JSONObject newObj = jsonObject;
+        String[] nodes = node.split("\\.");
+        for (int i = 0; i < nodes.length - 1; i++) {
+            newObj = newObj.getJSONObject(nodes[i]);
+        }
+        JSONArray array = newObj.getJSONArray(nodes[nodes.length - 1]);
+        long[] numbers = new long[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            numbers[i] = array.getLong(i);
+        }
+        return numbers;
+    }
+
+    @HostAccess.Export
     public Config getObject(String node) {
         JSONObject newObj = jsonObject;
         String[] nodes = node.split("\\.");
@@ -125,12 +140,27 @@ public class Config {
 
     @HostAccess.Export
     public void put(String node, Object value) {
-        String[] nodes = node.split("\\.");
-        for (int i = 0; i < nodes.length - 1; i++) {
-            if (!jsonObject.has(nodes[i])) {
-                jsonObject.put(nodes[i], new JSONObject());
-            }
+        if (node == null || node.isEmpty()) {
+            return;
         }
-        jsonObject.put(nodes[nodes.length - 1], value);
+        String[] nodes = node.split("\\.");
+        if (nodes.length == 0) {
+            return;
+        }
+        JSONObject currentJson = jsonObject;
+        for (int i = 0; i < nodes.length - 1; i++) {
+            String currentNode = nodes[i];
+            if (currentNode.isEmpty()) {
+                return;
+            }
+            if (!currentJson.has(currentNode) || !(currentJson.get(currentNode) instanceof JSONObject)) {
+                currentJson.put(currentNode, new JSONObject());
+            }
+            currentJson = currentJson.getJSONObject(currentNode);
+        }
+        String lastNode = nodes[nodes.length - 1];
+        if (!lastNode.isEmpty()) {
+            currentJson.put(lastNode, value);
+        }
     }
 }

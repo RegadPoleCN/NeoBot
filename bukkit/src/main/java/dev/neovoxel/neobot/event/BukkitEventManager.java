@@ -18,7 +18,7 @@ public class BukkitEventManager implements Listener {
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
-        plugin.getGameEventListener().onJoin(new BukkitJoinEvent(event));
+        plugin.getGameEventListener().onLogin(new BukkitLoginEvent(event));
     }
 
     @EventHandler

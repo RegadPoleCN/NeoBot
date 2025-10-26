@@ -11,6 +11,8 @@ import dev.neovoxel.neobot.script.ScriptProvider;
 import dev.neovoxel.neobot.storage.StorageProvider;
 import dev.neovoxel.neobot.util.CommandSender;
 import dev.neovoxel.neobot.util.NeoLogger;
+import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.Value;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -49,9 +51,11 @@ public interface NeoBot extends ConfigProvider, GameProvider, LibraryProvider, S
     }
     
     default void disable() {
+        getMessageConfig().flush(this);
         getNeoLogger().info("Unloading all scripts...");
         getScriptProvider().unloadScript();
         getBotProvider().getBotListener().reset();
+        getGameEventListener().reset();
         getNeoLogger().info("Cancelling all the tasks...");
         cancelAllTasks();
         getNeoLogger().info("Disconnecting to the bot...");
@@ -68,6 +72,7 @@ public interface NeoBot extends ConfigProvider, GameProvider, LibraryProvider, S
             getNeoLogger().info("Reloading bot...");
             getBotProvider().reloadBot();
             getBotProvider().getBotListener().reset();
+            getGameEventListener().reset();
             getNeoLogger().info("Reloading scripts...");
             try {
                 getScriptProvider().unloadScript();
@@ -104,4 +109,14 @@ public interface NeoBot extends ConfigProvider, GameProvider, LibraryProvider, S
     void registerCommands();
 
     void cancelAllTasks();
+
+    @HostAccess.Export
+    default void addInternalParser(Value parser) {
+        getScriptProvider().loadParser(parser);
+    }
+
+    @HostAccess.Export
+    default String internalParse(String content) {
+        return getScriptProvider().parse(content);
+    }
 }

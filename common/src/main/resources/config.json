@@ -33,7 +33,10 @@
       "access-token": ""
     },
     "options": {
-      "check-interval": 30
+      "check-interval": 30,
+      "enable-groups": [
+        114514
+      ]
     }
   }
 }
