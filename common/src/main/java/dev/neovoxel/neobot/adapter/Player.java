@@ -1,4 +1,4 @@
-package dev.neovoxel.neobot.util;
+package dev.neovoxel.neobot.adapter;
 
 import lombok.Getter;
 

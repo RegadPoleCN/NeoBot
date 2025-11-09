@@ -1,7 +1,5 @@
 package dev.neovoxel.neobot.adapter;
 
-import dev.neovoxel.neobot.util.CommandSender;
-
 public class BukkitCommandSender extends CommandSender {
     private final org.bukkit.command.CommandSender sender;
 

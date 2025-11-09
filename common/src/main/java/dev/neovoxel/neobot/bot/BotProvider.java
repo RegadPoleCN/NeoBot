@@ -81,7 +81,9 @@ public class BotProvider {
         getBot().forEach(NBotClient::disconnect);
     }
 
-    public void reloadBot() {
-        getBot().forEach(NBotClient::reconnect);
+    public void reloadBot(NeoBot plugin) throws URISyntaxException {
+        unloadBot();
+        getBot().clear();
+        loadBot(plugin);
     }
 }

@@ -1,7 +1,5 @@
 package dev.neovoxel.neobot.adapter;
 
-import dev.neovoxel.neobot.util.NeoLogger;
-
 import java.util.logging.Logger;
 
 public class BukkitLogger implements NeoLogger {

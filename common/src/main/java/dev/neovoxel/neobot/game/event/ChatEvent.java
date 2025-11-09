@@ -1,9 +1,7 @@
 package dev.neovoxel.neobot.game.event;
 
-import dev.neovoxel.neobot.util.Player;
+import dev.neovoxel.neobot.adapter.Player;
 import lombok.Getter;
-
-import java.util.UUID;
 
 @Getter
 public abstract class ChatEvent {

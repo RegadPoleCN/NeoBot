@@ -1,9 +1,10 @@
 package dev.neovoxel.neobot;
 
-import dev.neovoxel.neobot.adapter.BukkitCommandProvider;
-import dev.neovoxel.neobot.adapter.BukkitLogger;
-import dev.neovoxel.neobot.adapter.BukkitPlayer;
-import dev.neovoxel.neobot.adapter.BukkitScheduledTask;
+import dev.neovoxel.neobot.adapter.*;
+import dev.neovoxel.neobot.adapter.executor.BukkitConsoleSender;
+import dev.neovoxel.neobot.adapter.executor.DedicatedExecutor;
+import dev.neovoxel.neobot.adapter.executor.MinecraftServerExecutor;
+import dev.neovoxel.neobot.adapter.executor.NativeExecutor;
 import dev.neovoxel.neobot.bot.BotListener;
 import dev.neovoxel.neobot.bot.BotProvider;
 import dev.neovoxel.neobot.command.CommandProvider;
@@ -13,11 +14,14 @@ import dev.neovoxel.neobot.game.GameEventListener;
 import dev.neovoxel.neobot.scheduler.ScheduledTask;
 import dev.neovoxel.neobot.script.Script;
 import dev.neovoxel.neobot.script.ScriptProvider;
-import dev.neovoxel.neobot.util.NeoLogger;
-import dev.neovoxel.neobot.util.Player;
+import dev.neovoxel.neobot.adapter.NeoLogger;
+import dev.neovoxel.neobot.adapter.OfflinePlayer;
+import dev.neovoxel.neobot.adapter.Player;
 import dev.neovoxel.nsapi.DatabaseStorage;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.graalvm.polyglot.HostAccess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,6 +136,7 @@ public class NeoBotBukkit extends JavaPlugin implements NeoBot {
     }
 
     @Override
+    @HostAccess.Export
     public DatabaseStorage getStorage() {
         return storage;
     }
@@ -183,6 +188,11 @@ public class NeoBotBukkit extends JavaPlugin implements NeoBot {
     }
 
     @Override
+    public OfflinePlayer getOfflinePlayer(String name) {
+        return new BukkitOfflinePlayer(Bukkit.getOfflinePlayer(name));
+    }
+
+    @Override
     public Player[] getOnlinePlayers() {
         List<Player> players = new ArrayList<>();
         for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
@@ -192,7 +202,41 @@ public class NeoBotBukkit extends JavaPlugin implements NeoBot {
     }
 
     @Override
-    public String parsePlaceholder(String message, Player player) {
-        return message;
+    public String externalParsePlaceholder(String message, OfflinePlayer player) {
+        try {
+            if (player == null) {
+                return PlaceholderAPI.setPlaceholders(null, message);
+            } else if (Bukkit.getPlayer(player.getName()) == null) {
+                return PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(player.getName()), message);
+            } else {
+                return PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(player.getName()), message);
+            }
+        } catch (Exception ignored) {
+            return message;
+        }
+    }
+
+    @Override
+    public String getPlatform() {
+        return "Bukkit";
+    }
+
+    @Override
+    public boolean isPluginLoaded(String name) {
+        return Bukkit.getPluginManager().isPluginEnabled(name);
+    }
+
+    @Override
+    public RemoteExecutor getExecutorByName(String name) {
+        if (name.equalsIgnoreCase("native")) {
+            return new NativeExecutor();
+        } else if (name.equalsIgnoreCase("dedicated")) {
+            return new DedicatedExecutor();
+        } else if (name.equalsIgnoreCase("minecraft")) {
+            return new MinecraftServerExecutor();
+        } else if (name.equalsIgnoreCase("bukkit")) {
+            return new BukkitConsoleSender();
+        }
+        return null;
     }
 }

@@ -3,7 +3,7 @@ package dev.neovoxel.neobot.game;
 import dev.neovoxel.neobot.NeoBot;
 import dev.neovoxel.neobot.game.event.ChatEvent;
 import dev.neovoxel.neobot.game.event.LoginEvent;
-import dev.neovoxel.neobot.util.Player;
+import dev.neovoxel.neobot.adapter.Player;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
@@ -56,5 +56,13 @@ public class GameEventListener {
 
     public void onChat(ChatEvent event) {
         fireEvent("ChatEvent", event);
+    }
+
+    public void onPluginEnable() {
+        fireEvent("PluginEnableEvent");
+    }
+
+    public void onPluginDisable() {
+        fireEvent("PluginDisableEvent");
     }
 }

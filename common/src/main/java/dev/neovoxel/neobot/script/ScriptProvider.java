@@ -1,25 +1,15 @@
 package dev.neovoxel.neobot.script;
 
-import com.oracle.truffle.polyglot.PolyglotImpl;
-import dev.neovoxel.jarflow.JarFlow;
-import dev.neovoxel.jarflow.dependency.Dependency;
 import dev.neovoxel.neobot.NeoBot;
 import lombok.Getter;
 import lombok.Setter;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Engine;
-import org.graalvm.polyglot.HostAccess;
-import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.*;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ScriptProvider {
     @Getter
@@ -62,6 +52,7 @@ public class ScriptProvider {
                 .build();
         context = Context.newBuilder("js")
                 .allowIO(true)
+                .allowAllAccess(true)
                 .engine(engine)
                 .build();
         context.getBindings("js").putMember("qq", plugin.getBotProvider().getBotListener());
@@ -75,6 +66,7 @@ public class ScriptProvider {
         if (!scriptPath.exists()) {
             scriptPath.mkdirs();
         }
+        Set<Script> unsortedScripts = new HashSet<>();
         for (File file : scriptPath.listFiles()) {
             if (!file.isDirectory()) {
                 continue;
@@ -94,27 +86,43 @@ public class ScriptProvider {
                     jsonObject.getString("name"),
                     jsonObject.getString("author"),
                     jsonObject.getString("version"),
-                    jsonObject.getString("entrypoint")
+                    new File(file, jsonObject.getString("entrypoint"))
             );
             if (jsonObject.has("description")) {
                 script.setDescription(jsonObject.getString("description"));
             }
-            File jsFile = new File(file, jsonObject.getString("entrypoint"));
-            if (!jsFile.exists()) {
-                plugin.getNeoLogger().warn("The script " + script.getName() + " does not have a entrypoint file " + jsFile.getName());
-                continue;
+            if (jsonObject.has("loadbefore")) {
+                for (Object object : jsonObject.getJSONArray("loadbefore")) {
+                    script.getLoadbefore().add(object.toString());
+                }
             }
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsFile), StandardCharsets.UTF_8));
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line).append("\n");
+            if (jsonObject.has("loadafter")) {
+                for (Object object : jsonObject.getJSONArray("loadafter")) {
+                    script.getLoadafter().add(object.toString());
+                }
             }
-            context.eval("js", builder.toString());
-            addLoadedScript(script);
-            plugin.getNeoLogger().info("Loaded script " + script.getName());
+            unsortedScripts.add(script);
+        }
+        List<Script> sortedScripts = Script.sortScripts(unsortedScripts);
+        for (Script script : sortedScripts) {
+            loadScript(plugin, script);
         }
         scriptSystemLoaded = true;
+    }
+
+    public void loadScript(NeoBot plugin, Script script) throws Throwable {
+        if (!script.getEntrypoint().exists()) {
+            plugin.getNeoLogger().warn("The script " + script.getName() + " is missing the entrypoint file.");
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script.getEntrypoint()), StandardCharsets.UTF_8));
+        StringBuilder builder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line).append("\n");
+        }
+        context.eval("js", builder.toString());
+        addLoadedScript(script);
+        plugin.getNeoLogger().info("Loaded script " + script.getName());
     }
 
     public void unloadScript() {

@@ -1,7 +1,7 @@
 package dev.neovoxel.neobot.command;
 
 import dev.neovoxel.neobot.NeoBot;
-import dev.neovoxel.neobot.util.CommandSender;
+import dev.neovoxel.neobot.adapter.CommandSender;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 import org.json.JSONArray;

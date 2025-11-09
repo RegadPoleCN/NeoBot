@@ -125,6 +125,11 @@ public class Config {
     }
 
     @HostAccess.Export
+    public String[] getKeys() {
+        return jsonObject.keySet().toArray(new String[0]);
+    }
+
+    @HostAccess.Export
     public boolean has(String node) {
         try {
             JSONObject newObj = jsonObject;

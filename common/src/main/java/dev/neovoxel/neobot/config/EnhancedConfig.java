@@ -38,7 +38,7 @@ public class EnhancedConfig extends Config {
     public void flush(NeoBot plugin) {
         try {
             if (!file.exists()) {
-                plugin.saveResource(plugin.getDataFolder(), "messages.json");
+                plugin.saveResource(plugin.getDataFolder(), file.getName());
             }
             String originContent = new String(Files.readAllBytes(file.toPath()));
             JSONObject jsonObject = new JSONObject(originContent);

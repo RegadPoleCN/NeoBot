@@ -19,7 +19,7 @@ public interface ConfigProvider {
         if (!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdirs();
         }
-        loadGeneralConfig(plugin);
+        getGeneralConfig().flush(plugin);
         getMessageConfig().flush(plugin);
     }
 

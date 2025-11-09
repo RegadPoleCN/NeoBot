@@ -70,6 +70,7 @@ declare interface GroupMemberInfo {
     getTitle(): string
     getTitleExpireTime(): number
     getCardChangeable(): boolean
+    getRole(): Object
 }
 
 declare interface QQ {
@@ -137,6 +138,7 @@ declare interface Config {
     getBoolean(node: string): boolean
     has(node: string): boolean
     put(node: string, value: any): void // 该方法并不将 put 的对象持久化
+    getKeys(): string[]
     getObject(node: string): Config
     getArray(node: string): Config[]
     getStringArray(node: string): string[]
@@ -158,7 +160,6 @@ declare interface Logger {
 }
 
 declare interface DatabaseCreator {
-    column(name: string, type: string): DatabaseCreator
     column(name: string, type: string, extraOptions: string): DatabaseCreator
     execute(): void
 }
@@ -221,11 +222,15 @@ declare interface DatabaseStorage {
     table(name: string): DatabaseTable
 }
 
-declare interface Player {
-    getName(): string
+declare interface Player extends OfflinePlayer {
     sendMessage(message: string): void
     hasPermission(permission: string): boolean
     kick(message: string): void
+}
+
+declare interface OfflinePlayer {
+    getName(): string
+    isOnline(): boolean
 }
 
 declare interface ScriptManager {
@@ -238,6 +243,20 @@ declare interface ScriptManager {
 
 declare const scriptManager: ScriptManager
 
+declare interface Object {
+    toString(): string
+}
+
+declare interface Executor {
+    init(): boolean
+    execute(command: string): void
+    getResult(): string
+}
+
+declare interface Task {
+    cancel(): void
+}
+
 declare interface NeoBot {
     getNeoLogger(): Logger
     getStorage(): DatabaseStorage
@@ -245,7 +264,17 @@ declare interface NeoBot {
     broadcast(message: string): void;
     getOnlinePlayers(): Player[]
     getOnlinePlayer(name: string): Player
+    getOfflinePlayer(name: string): OfflinePlayer
     parsePlaceholder(message: string, player: Player): string
+    isPluginLoaded(name: string): boolean
+    getPlatform(): string
+    getExecutorByName(name: string): Executor
+    submit(task: () => void): Task
+    submitAsync(task: () => void): Task
+    submit(task: () => void, delay: number): Task
+    submitAsync(task: () => void, delay: number): Task
+    submit(task: () => void, delay: number, period: number): Task
+    submitAsync(task: () => void, delay: number, period: number): Task
 }
 
 declare const plugin: NeoBot

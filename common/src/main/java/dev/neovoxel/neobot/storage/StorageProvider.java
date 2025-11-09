@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import dev.neovoxel.neobot.NeoBot;
 import dev.neovoxel.nsapi.DatabaseStorage;
 import dev.neovoxel.nsapi.util.DatabaseStorageType;
+import org.graalvm.polyglot.HostAccess;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -12,6 +13,7 @@ public interface StorageProvider {
 
     void setStorage(DatabaseStorage storage);
 
+    @HostAccess.Export
     DatabaseStorage getStorage();
 
     String getStorageType();

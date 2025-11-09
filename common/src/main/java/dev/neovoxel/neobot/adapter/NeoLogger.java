@@ -1,4 +1,4 @@
-package dev.neovoxel.neobot.util;
+package dev.neovoxel.neobot.adapter;
 
 public interface NeoLogger {
     void info(String message);

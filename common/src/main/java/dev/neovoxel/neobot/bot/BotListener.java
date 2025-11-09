@@ -19,13 +19,13 @@ import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 import org.json.JSONArray;
 
-import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class BotListener implements NBotListener {
     private final NeoBot plugin;
 
-    private final Map<Value, String> map = new IdentityHashMap<>();
+    private final Map<Value, String> map = new LinkedHashMap<>();
     
     public BotListener(NeoBot plugin) {
         this.plugin = plugin;
@@ -100,6 +100,7 @@ public class BotListener implements NBotListener {
         }
     }
 
+    @HostAccess.Export
     public void register(String eventName, Value method) {
         if (method.canExecute()) map.put(method, eventName);
     }

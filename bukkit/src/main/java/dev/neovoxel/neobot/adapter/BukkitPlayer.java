@@ -1,7 +1,5 @@
 package dev.neovoxel.neobot.adapter;
 
-import dev.neovoxel.neobot.util.Player;
-
 public class BukkitPlayer extends Player {
     private final org.bukkit.entity.Player player;
 
