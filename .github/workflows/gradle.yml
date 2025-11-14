@@ -31,7 +31,7 @@ jobs:
       - name: Make Gradle Wrapper Executable
         run: chmod +x ./gradlew
       - name: Build
-        run: ./gradlew package --stacktrace --info
+        run: ./gradlew shadowJar --stacktrace --info
       - name: Rename JARs if alpha
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
