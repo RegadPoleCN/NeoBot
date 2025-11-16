@@ -173,6 +173,8 @@ public class Config {
     }
 
     protected Object convertPolyglotValue(Object value) {
+
+        // GraalJS >= 23 : PolyglotList for JS arrays
         if (value instanceof List<?>) {
             List<?> list = (List<?>) value;
             JSONArray arr = new JSONArray();
@@ -181,14 +183,57 @@ public class Config {
             }
             return arr;
         }
-        if (value instanceof Map<?,?>) {
+
+        // GraalJS 22.* : JS Array becomes PolyglotMap
+        if (value instanceof Map<?, ?>) {
             Map<?, ?> map = (Map<?, ?>) value;
+            if (isArrayLike(map)) {
+                JSONArray arr = new JSONArray();
+                int len = getArrayLikeLength(map);
+                for (int i = 0; i < len; i++) {
+                    Object v = map.get(String.valueOf(i));
+                    arr.put(convertPolyglotValue(v));
+                }
+                return arr;
+            }
+
+            // normal JS object
             JSONObject obj = new JSONObject();
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 obj.put(entry.getKey().toString(), convertPolyglotValue(entry.getValue()));
             }
             return obj;
         }
+
         return value;
+    }
+
+    private boolean isArrayLike(Map<?, ?> map) {
+        if (!map.containsKey("length")) return false;
+
+        Object lenObj = map.get("length");
+        if (!(lenObj instanceof Number)) return false;
+
+        int length = ((Number) lenObj).intValue();
+
+        // Check keys 0..length-1 all exist
+        for (int i = 0; i < length; i++) {
+            if (!map.containsKey(String.valueOf(i))) return false;
+        }
+
+        // No unexpected non-numeric keys
+        for (Object key : map.keySet()) {
+            String k = key.toString();
+            if (k.equals("length")) continue;
+            if (!k.matches("\\d+")) return false;
+        }
+
+        return true;
+    }
+
+    private int getArrayLikeLength(Map<?, ?> map) {
+        Object lenObj = map.get("length");
+        if (lenObj instanceof Number) return ((Number) lenObj).intValue();
+        return 0;
     }
 }

@@ -70,7 +70,7 @@ public interface LibraryProvider {
             storage = Dependency.builder()
                     .groupId("com.h2database")
                     .artifactId("h2")
-                    .version("2.4.240")
+                    .version("2.2.224")
                     .build();
         } else if (type == DatabaseStorageType.MYSQL) {
             storage = Dependency.builder()

@@ -35,7 +35,7 @@ subprojects {
         compileOnly("com.mysql:mysql-connector-j:8.2.0")
         compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.6")
         compileOnly("org.postgresql:postgresql:42.7.8")
-        compileOnly("com.h2database:h2:2.4.240")
+        compileOnly("com.h2database:h2:2.2.224")
         compileOnly("org.xerial:sqlite-jdbc:3.50.3.0")
 
         // annotations
