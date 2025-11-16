@@ -1,0 +1,12 @@
+name: NeoBot
+main: dev.neovoxel.neobot.NeoBotFolia
+version: 0.1
+author: NeoVoxelDev
+description: A bot plugin that connects Minecraft with QQ, Kook, Discord, etc.
+api-version: 1.13
+softdepend:
+  - PlaceholderAPI
+folia-supported: true
+commands:
+  neobot:
+    description: NeoBot command

@@ -31,7 +31,7 @@ jobs:
       - name: Make Gradle Wrapper Executable
         run: chmod +x ./gradlew
       - name: Build
-        run: ./gradlew shadowJar --stacktrace --info
+        run: ./gradlew build --stacktrace --info
       - name: Rename JARs if alpha
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
@@ -51,6 +51,6 @@ jobs:
       - name: Capture Build Artifacts
         uses: actions/upload-artifact@v4.6.0
         with:
-          name: NeoBot-Bukkit
+          name: NeoBot-All
           path: |
-            bukkit/build/libs/*.jar
+            outputs/*.jar

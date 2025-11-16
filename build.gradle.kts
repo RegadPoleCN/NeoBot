@@ -58,6 +58,42 @@ subprojects {
         archiveFileName.set("NeoBot-${archiveFileName.get()}")
         relocate("org.bstats", "dev.neovoxel.neobot.libs.bstats")
     }
+}
 
+tasks.register("package") {
+    val outputDir = rootDir.resolve("outputs")
+    outputDir.mkdirs()
+    subprojects.forEach {
+        if (it.project.name == "common" || it.project.name == "fabric") {
+            return@forEach
+        }
 
+        if (it.tasks.map { it.name }.contains("shadowJar")) {
+            dependsOn(it.tasks.named("shadowJar"))
+            doLast {
+                val file = it.tasks.getByName<AbstractArchiveTask>("shadowJar").archiveFile.get().asFile
+                file.copyTo(outputDir.resolve(file.name), true)
+            }
+        } else if (it.tasks.map { it.name }.contains("remapJar")) {
+            dependsOn(it.tasks.named("remapJar"))
+            doLast {
+                val file = it.tasks.getByName<AbstractArchiveTask>("remapJar").archiveFile.get().asFile
+                file.copyTo(outputDir.resolve(file.name), true)
+            }
+        } else {
+            dependsOn(it.tasks.named("jar"))
+            doLast {
+                val file = it.tasks.getByName<Jar>("jar").archiveFile.get().asFile
+                file.copyTo(outputDir.resolve(file.name), true)
+            }
+        }
+    }
+}
+
+tasks.clean {
+    delete(rootDir.resolve("outputs"))
+}
+
+tasks.build {
+    dependsOn("package")
 }
