@@ -7,12 +7,14 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.util.GameProfile;
+import dev.neovoxel.jarflow.JarFlow;
 import dev.neovoxel.neobot.adapter.*;
 import dev.neovoxel.neobot.bot.BotProvider;
 import dev.neovoxel.neobot.command.CommandProvider;
 import dev.neovoxel.neobot.config.EnhancedConfig;
 import dev.neovoxel.neobot.config.ScriptConfig;
 import dev.neovoxel.neobot.game.GameEventListener;
+import dev.neovoxel.neobot.loader.VelocityLibraryLoader;
 import dev.neovoxel.neobot.scheduler.ScheduledTask;
 import dev.neovoxel.neobot.script.ScriptProvider;
 import dev.neovoxel.neobot.script.ScriptScheduler;
@@ -20,6 +22,7 @@ import dev.neovoxel.neobot.storage.StorageProvider;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.graalvm.polyglot.HostAccess;
 import org.slf4j.Logger;
 
@@ -79,6 +82,7 @@ public class NeoBotVelocity implements NeoBot {
         this.proxyServer = proxyServer;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
+        JarFlow.setLoader(new VelocityLibraryLoader(this, proxyServer.getPluginManager()));
     }
 
     @Subscribe
@@ -147,7 +151,7 @@ public class NeoBotVelocity implements NeoBot {
     @HostAccess.Export
     @Override
     public void broadcast(String message) {
-        proxyServer.sendMessage(Component.text(message));
+        proxyServer.sendMessage(LegacyComponentSerializer.legacySection().deserialize(message));
     }
 
     @HostAccess.Export

@@ -27,7 +27,7 @@ public interface LibraryProvider {
         if (!hasDownloaded(libDir, json)) {
             DependencyDownloader.download(Repository.mavenCentral(), json, libDir, 4);
         }
-        ExternalLoader.load(path.toFile());
+        JarFlow.getLoader().load(path.toFile());
         Dependency wsApi = Dependency.builder()
                 .groupId("org.java-websocket")
                 .artifactId("Java-WebSocket")

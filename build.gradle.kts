@@ -20,7 +20,7 @@ subprojects {
 
     dependencies {
         // basic
-        implementation("dev.neovoxel.jarflow:JarFlow:1.5.0") {
+        implementation("dev.neovoxel.jarflow:JarFlow:1.6.0") {
             exclude("org.json")
         }
         compileOnly("org.java-websocket:Java-WebSocket:1.6.0")

@@ -2,6 +2,7 @@ package dev.neovoxel.neobot.adapter;
 
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.graalvm.polyglot.HostAccess;
 
 public class VelocityCommandSender extends CommandSender {
@@ -15,7 +16,7 @@ public class VelocityCommandSender extends CommandSender {
     @HostAccess.Export
     @Override
     public void sendMessage(String message) {
-        source.sendMessage(Component.text(message));
+        source.sendMessage(LegacyComponentSerializer.legacySection().deserialize(message));
     }
 
     @HostAccess.Export

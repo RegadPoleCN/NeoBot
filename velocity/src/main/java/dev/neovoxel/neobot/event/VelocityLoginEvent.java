@@ -3,6 +3,7 @@ package dev.neovoxel.neobot.event;
 import com.velocitypowered.api.event.ResultedEvent;
 import dev.neovoxel.neobot.game.event.LoginEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.graalvm.polyglot.HostAccess;
 
 public class VelocityLoginEvent extends LoginEvent {
@@ -16,6 +17,6 @@ public class VelocityLoginEvent extends LoginEvent {
     @HostAccess.Export
     @Override
     public void disallow(String reason) {
-        loginEvent.setResult(ResultedEvent.ComponentResult.denied(Component.text(reason)));
+        loginEvent.setResult(ResultedEvent.ComponentResult.denied(LegacyComponentSerializer.legacySection().deserialize(reason)));
     }
 }
