@@ -9,6 +9,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Data
 @RequiredArgsConstructor
@@ -18,7 +20,7 @@ public class Repository {
     private String author;
     private String description;
     private String website;
-    private final String url;
+    private String url;
     private List<RemoteScript> scripts = new ArrayList<>();
     private static final Map<String, String> headers = new HashMap<>();
 
@@ -28,16 +30,23 @@ public class Repository {
     }
 
     public void fetch() throws IOException, JSONException {
-        String s = HttpUtil.get(url, headers);
-        JSONObject jsonObject = new JSONObject(s);
-        String encoding = jsonObject.getString("encoding");
-        String content = jsonObject.getString("content");
-        JSONObject jsonContent;
-        if (encoding.equalsIgnoreCase("base64")) {
-            jsonContent = new JSONObject(new String(Base64.getMimeDecoder().decode(content)));
-        } else {
-            jsonContent = new JSONObject(content);
+        String regex = "https://api.github.com/(.*)/contents/(.*)";
+        Matcher matcher = Pattern.compile(regex).matcher(url);
+        if(matcher.find()) {
+            url = "https://raw.githubusercontent.com/" + matcher.group(1) + "/refs/heads/main/" + matcher.group(2);
         }
+        String s = HttpUtil.get(url, headers);
+        JSONObject jsonContent = new JSONObject(s);
+        // api.github.com
+//        JSONObject jsonObject = new JSONObject(s);
+//        String encoding = jsonObject.getString("encoding");
+//        String content = jsonObject.getString("content");
+//        JSONObject jsonContent;
+//        if (encoding.equalsIgnoreCase("base64")) {
+//            jsonContent = new JSONObject(new String(Base64.getMimeDecoder().decode(content)));
+//        } else {
+//            jsonContent = new JSONObject(content);
+//        }
         schemaVersion = jsonContent.getInt("schema_version");
         name = jsonContent.getString("name");
         author = jsonContent.getString("author");
