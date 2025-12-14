@@ -132,7 +132,7 @@ public class ConfigWatcher implements Runnable{
 
         try {
             watchExecutor = Executors.newSingleThreadExecutor(r -> {
-                Thread t = new Thread(r, "PathFinder-ConfigWatcher");
+                Thread t = new Thread(r, "NeoBot-ConfigWatcher");
                 t.setDaemon(true);
                 return t;
             });
