@@ -9,8 +9,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Data
 @RequiredArgsConstructor
@@ -30,24 +28,8 @@ public class Repository {
     }
 
     public void fetch() throws IOException, JSONException {
-        String urlString = url;
-        String regex = "https://api.github.com/(.*)/contents/(.*)";
-        Matcher matcher = Pattern.compile(regex).matcher(urlString);
-        if(matcher.find()) {
-            urlString = "https://raw.githubusercontent.com/" + matcher.group(1) + "/refs/heads/main/" + matcher.group(2);
-        }
-        String s = HttpUtil.get(urlString, headers);
+        String s = HttpUtil.get(url, headers);
         JSONObject jsonContent = new JSONObject(s);
-        // api.github.com
-//        JSONObject jsonObject = new JSONObject(s);
-//        String encoding = jsonObject.getString("encoding");
-//        String content = jsonObject.getString("content");
-//        JSONObject jsonContent;
-//        if (encoding.equalsIgnoreCase("base64")) {
-//            jsonContent = new JSONObject(new String(Base64.getMimeDecoder().decode(content)));
-//        } else {
-//            jsonContent = new JSONObject(content);
-//        }
         schemaVersion = jsonContent.getInt("schema_version");
         name = jsonContent.getString("name");
         author = jsonContent.getString("author");
