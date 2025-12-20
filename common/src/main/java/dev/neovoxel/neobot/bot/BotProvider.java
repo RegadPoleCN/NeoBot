@@ -46,7 +46,7 @@ public class BotProvider {
         }
         plugin.submitAsync(() -> {
             for (NBotClient client : getBot()) {
-                if (!client.isConnected()) client.reconnect();
+                if (!client.isConnected() && client instanceof OBWSClient) client.reconnect();
             }
         }, 0, plugin.getGeneralConfig().getInt("bot.options.check-interval"));
     }
@@ -66,7 +66,7 @@ public class BotProvider {
     }
 
     public void loadOnebot11WsReverse(NeoBot plugin) {
-        String address = plugin.getGeneralConfig().getString("bot.onebot11-ws-reverse.url");
+        String address = plugin.getGeneralConfig().getString("bot.onebot11-ws-reverse.address");
         int port = plugin.getGeneralConfig().getInt("bot.onebot11-ws-reverse.port");
         String token = plugin.getGeneralConfig().getString("bot.onebot11-ws-reverse.access-token");
         OBWSServer client;
@@ -76,7 +76,6 @@ public class BotProvider {
         addBot("onebot11-ws-reverse", client);
         setBotListener(new BotListener(plugin));
         client.addListener(getBotListener());
-        client.connect();
     }
 
     public void unloadBot() {
