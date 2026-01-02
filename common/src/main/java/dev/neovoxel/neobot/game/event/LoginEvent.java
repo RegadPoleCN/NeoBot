@@ -5,7 +5,7 @@ import org.graalvm.polyglot.HostAccess;
 
 import java.util.UUID;
 
-@Getter(onMethod_ = {@HostAccess.Export{})
+@Getter(onMethod_ = {@HostAccess.Export})
 public abstract class LoginEvent {
     private final String name;
     private final UUID uuid;
