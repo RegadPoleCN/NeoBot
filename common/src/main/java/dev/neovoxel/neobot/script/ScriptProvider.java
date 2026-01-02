@@ -11,6 +11,7 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -40,7 +41,7 @@ public class ScriptProvider {
 
     private static final Engine engine;
 
-    private static final List<Class> exposed = new ArrayList<>();
+    private static final List<Class<?>> exposed = new ArrayList<>();
 
     private static final HostAccess hostAccess;
 
@@ -74,6 +75,8 @@ public class ScriptProvider {
         builder1.allowArrayAccess(true);
         exposed.add(Object.class);
         exposed.add(Enum.class);
+        exposed.add(JSONObject.class);
+        exposed.add(JSONArray.class);
         for (Class<?> clazz : exposed) {
             for (Method method : clazz.getMethods()) {
                 if (method.getName().equals("wait") || method.getName().equals("notify") || method.getName().equals("notifyAll")) {
