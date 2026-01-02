@@ -151,6 +151,7 @@ public class ScriptProvider {
         for (Script script : checkedScripts) {
             loadScript(plugin, script);
         }
+        plugin.getScriptConfig().flush(plugin);
         scriptSystemLoaded = true;
     }
     
@@ -211,6 +212,7 @@ public class ScriptProvider {
         }
         try {
             loadScript(plugin, script);
+            plugin.getScriptConfig().flush(plugin);
         } catch (Throwable e) {
             return plugin.getMessageConfig().getMessage("internal.script.load.error")
                     .replace("error", e.getMessage());
