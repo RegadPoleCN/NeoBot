@@ -13,7 +13,6 @@ import dev.neovoxel.nbapi.event.request.GroupRequestType;
 import dev.neovoxel.nbapi.listener.NBotEventHandler;
 import dev.neovoxel.nbapi.listener.NBotListener;
 import dev.neovoxel.neobot.NeoBot;
-import dev.neovoxel.neobot.bot.types.NGroupMessageEvent;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 import org.json.JSONArray;
@@ -246,7 +245,7 @@ public class BotListener implements NBotListener {
     
     @NBotEventHandler
     private void onGroupMessage(GroupMessageEvent event) {
-        fireEvent("GroupMessageEvent", new NGroupMessageEvent(event));
+        fireEvent("GroupMessageEvent", event);
     }
 
     @NBotEventHandler

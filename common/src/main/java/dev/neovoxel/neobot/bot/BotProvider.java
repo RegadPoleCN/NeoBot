@@ -46,9 +46,9 @@ public class BotProvider {
         }
         plugin.submitAsync(() -> {
             for (NBotClient client : getBot()) {
-                if (!client.isConnected() && client instanceof OBWSClient) client.reconnect();
+                if (!client.isConnected()) client.reconnect();
             }
-        }, 0, plugin.getGeneralConfig().getInt("bot.options.check-interval"));
+        }, 5, plugin.getGeneralConfig().getInt("bot.options.check-interval"));
     }
 
     public void loadOnebot11Ws(NeoBot plugin) throws URISyntaxException {
@@ -76,6 +76,7 @@ public class BotProvider {
         addBot("onebot11-ws-reverse", client);
         setBotListener(new BotListener(plugin));
         client.addListener(getBotListener());
+        client.connect();
     }
 
     public void unloadBot() {

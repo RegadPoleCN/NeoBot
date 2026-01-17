@@ -3,12 +3,15 @@ package dev.neovoxel.neobot.script;
 import dev.neovoxel.jarflow.JarFlow;
 import dev.neovoxel.neobot.NeoBot;
 import dev.neovoxel.neobot.util.ValueWithScript;
+import dev.neovoxel.neobot.util.http.HttpBuilder;
+import dev.neovoxel.neobot.util.ws.ExternalWSUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -38,7 +41,7 @@ public class ScriptProvider {
 
     private static final Engine engine;
 
-    private static final List<Class> exposed = new ArrayList<>();
+    private static final List<Class<?>> exposed = new ArrayList<>();
 
     private static final HostAccess hostAccess;
 
@@ -72,10 +75,12 @@ public class ScriptProvider {
         builder1.allowArrayAccess(true);
         exposed.add(Object.class);
         exposed.add(Enum.class);
+        exposed.add(JSONObject.class);
+        exposed.add(JSONArray.class);
         for (Class<?> clazz : exposed) {
             for (Method method : clazz.getMethods()) {
                 if (method.getName().equals("wait") || method.getName().equals("notify") || method.getName().equals("notifyAll")) {
-                    continue; // 跳过敏感方法
+                    continue;
                 }
                 builder1.allowAccess(method);
             }
@@ -149,6 +154,7 @@ public class ScriptProvider {
         for (Script script : checkedScripts) {
             loadScript(plugin, script);
         }
+        plugin.getScriptConfig().flush(plugin);
         scriptSystemLoaded = true;
     }
     
@@ -209,6 +215,7 @@ public class ScriptProvider {
         }
         try {
             loadScript(plugin, script);
+            plugin.getScriptConfig().flush(plugin);
         } catch (Throwable e) {
             return plugin.getMessageConfig().getMessage("internal.script.load.error")
                     .replace("error", e.getMessage());
@@ -243,6 +250,8 @@ public class ScriptProvider {
         context.getBindings("js").putMember("gameCommand", plugin.getCommandProvider());
         context.getBindings("js").putMember("messageConfig", plugin.getMessageConfig());
         context.getBindings("js").putMember("generalConfig", plugin.getScriptConfig());
+        context.getBindings("js").putMember("http", new HttpBuilder.Factory());
+        context.getBindings("js").putMember("ws", new ExternalWSUtil());
         context.getBindings("js").putMember("scriptManager", this);
         context.getBindings("js").putMember("__uuid__", uuid);
         contexts.put(script, context);
