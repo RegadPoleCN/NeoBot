@@ -2,7 +2,7 @@
   "Group": "dev.neovoxel",
   "Name": "NeoBot",
   "Version": "0.1",
-  "Description": "A bot plugin for QQ and Onebot.",
+  "Description": "A bot plugin that connects Minecraft with QQ, Kook, Discord, etc.",
   "Authors": [
     {
       "Name": "NeoVoxelDev Team",
