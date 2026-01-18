@@ -10,7 +10,6 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.PluginBase;
 import com.hypixel.hytale.server.core.plugin.PluginManager;
-import com.hypixel.hytale.server.core.task.TaskRegistration;
 import com.hypixel.hytale.server.core.universe.Universe;
 import dev.neovoxel.neobot.adapter.*;
 import dev.neovoxel.neobot.bot.BotProvider;
@@ -28,8 +27,8 @@ import lombok.Setter;
 import org.graalvm.polyglot.HostAccess;
 
 import java.io.File;
-import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class NeoBotHytale extends JavaPlugin implements NeoBot {
 
@@ -72,8 +71,11 @@ public class NeoBotHytale extends JavaPlugin implements NeoBot {
     @Setter
     private CommandProvider commandProvider;
 
+    private HytaleScheduler scheduler;
+
     public NeoBotHytale(JavaPluginInit init) {
         super(init);
+        scheduler = new HytaleScheduler(this);
     }
 
     @Override
@@ -162,41 +164,35 @@ public class NeoBotHytale extends JavaPlugin implements NeoBot {
         return message;
     }
 
-    private TaskRegistration runTask(Runnable task) {
-
-    }
 
     @Override
     public ScheduledTask submit(Runnable task) {
-        Universe.get().getDefaultWorld().execute();
-        return new HytaleSchedulerTask();
+        return new HytaleSchedulerTask(scheduler.sync(task));
     }
 
     @Override
     public ScheduledTask submitAsync(Runnable task) {
-        return submit(task);
+        return new HytaleSchedulerTask(scheduler.async(task));
     }
 
     @Override
     public ScheduledTask submit(Runnable task, long delay) {
-        return new HytaleSchedulerTask(proxyServer.getScheduler().buildTask(this, task)
-                .delay(Duration.ofSeconds(delay)).schedule());
+        return new HytaleSchedulerTask(scheduler.syncLater(task, delay, TimeUnit.SECONDS));
     }
 
     @Override
     public ScheduledTask submitAsync(Runnable task, long delay) {
-        return submit(task, delay);
+        return new HytaleSchedulerTask(scheduler.asyncLater(task, delay, TimeUnit.SECONDS));
     }
 
     @Override
     public ScheduledTask submit(Runnable task, long delay, long period) {
-        return new HytaleSchedulerTask(proxyServer.getScheduler().buildTask(this, task)
-                .delay(Duration.ofSeconds(delay)).repeat(Duration.ofSeconds(period)).schedule());
+        return new HytaleSchedulerTask(scheduler.syncRepeating(task, delay, period, TimeUnit.SECONDS));
     }
 
     @Override
     public ScheduledTask submitAsync(Runnable task, long delay, long period) {
-        return submit(task, delay, period);
+        return new HytaleSchedulerTask(scheduler.asyncRepeating(task, delay, period, TimeUnit.SECONDS));
     }
 
     @Override

@@ -1,28 +1,28 @@
 package dev.neovoxel.neobot.adapter;
-import com.hypixel.hytale.server.core.task.TaskRegistration;
 import dev.neovoxel.neobot.scheduler.ScheduledTask;
 import org.graalvm.polyglot.HostAccess;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
 
 public class HytaleSchedulerTask implements ScheduledTask {
-    private TaskRegistration taskRegistration;
-    private static final Set<TaskRegistration> tasks = new HashSet<>();
+    private ScheduledFuture<?> task;
+    private static final Set<ScheduledFuture<?>> tasks = new HashSet<>();
 
-    public HytaleSchedulerTask(TaskRegistration task) {
-        this.taskRegistration = task;
+    public HytaleSchedulerTask(ScheduledFuture<?> task) {
+        this.task = task;
         tasks.add(task);
     }
 
     @HostAccess.Export
     @Override
     public void cancel() {
-        taskRegistration.unregister();
+        task.cancel(false);
     }
 
     public static void cancelAllTasks() {
-        tasks.forEach(TaskRegistration::unregister);
+        tasks.forEach(t -> t.cancel(false));
         tasks.clear();
     }
 }
