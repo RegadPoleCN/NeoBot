@@ -91,7 +91,7 @@ public class NeoBotHytale extends JavaPlugin implements NeoBot {
 
     @Override
     public File getDataFolder() {
-        return this.getDataFolder();
+        return getDataDirectory().toFile();
     }
 
     @Override
